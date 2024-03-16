@@ -1,17 +1,20 @@
 import express from 'express';
-import {ActiveConnections, Chat, IncomingMessage, UserFields, UserWithoutPasswordAndToken} from '../types';
 import expressWs from 'express-ws';
-import Message from '../models/Message';
-import {HydratedDocument} from 'mongoose';
+import {ActiveConnections, IncomingMessage, Message as MessageFields, UserFields} from '../types';
 import User from '../models/User';
+import {HydratedDocument} from 'mongoose';
+import Message from '../models/Message';
+
 
 const app = express();
-expressWs(app);
 const messagesRouter = express.Router();
+
+expressWs(app);
+
 const activeConnections: ActiveConnections = {};
 
-messagesRouter.ws('', async (ws, req) => {
-  const id = req.query.id as string;
+messagesRouter.ws('/:id', (ws, req) => {
+  const id = req.params.id;
   activeConnections[id] = ws;
 
   ws.on('close', () => {
@@ -19,59 +22,17 @@ messagesRouter.ws('', async (ws, req) => {
   });
 
   ws.on('message', async (msg) => {
-    const decodedMessage = JSON.parse(msg.toString()) as IncomingMessage;
+    const { type, payload } = JSON.parse(msg.toString()) as IncomingMessage;
 
     try {
-      switch (decodedMessage.type) {
-        case 'SEND_MESSAGE' :
-          const message = JSON.parse(JSON.stringify(decodedMessage.payload)) as Chat;
-
-          const user = await User.findById(message.author) as HydratedDocument<UserWithoutPasswordAndToken>;
-
-          if (!user) break;
-
-          Object.keys(activeConnections).forEach((key) => {
-            const conn = activeConnections[key];
-            conn.send(
-              (JSON.stringify({
-                type: 'NEW_MESSAGE',
-                payload: {
-                  author: {
-                    _id: user._id,
-                    username: user.username,
-                    displayName: user.displayName,
-                  },
-                  message: message.message
-                }
-              }))
-            );
-          });
-
-          const sms = new Message({
-            author: message.author,
-            message: message.message
-          });
-
-          await sms.save();
-          break;
-
-        case 'GET_MESSAGES':
-          const messages = await Message.find().populate('author', 'username displayName').limit(30);
-
-          ws.send(JSON.stringify({
-            type: 'GET_MESSAGES',
-            payload: messages
-          }));
-
-          break;
+      switch (type) {
         case 'GET_USERS':
-          const users: UserWithoutPasswordAndToken[] = [];
+          const onlineUsers: HydratedDocument<UserFields>[] = [];
 
-          const promises = Object.keys(activeConnections).map(async connId => {
-            const user = await User.findById(connId) as HydratedDocument<UserFields>;
-
+          const promises = Object.keys(activeConnections).map(async (userId) => {
+            const user = await User.findById(userId);
             if (user) {
-              users.push({username: user.username, displayName: user.displayName, _id: user._id});
+              onlineUsers.push(user);
             }
           });
 
@@ -79,16 +40,82 @@ messagesRouter.ws('', async (ws, req) => {
 
           ws.send(JSON.stringify({
             type: 'GET_USERS',
-            payload: users,
+            payload: onlineUsers.map(user => ({
+              _id: user._id,
+              username: user.username,
+              displayName: user.displayName,
+              role: user.role,
+              avatar: user.avatar,
+            })),
           }));
           break;
+        case 'GET_MESSAGES':
+          const messages = await Message.find()
+            .sort({ datetime: 1 })
+            .populate('user', 'username role displayName avatar')
+            .limit(30);
+
+          ws.send(JSON.stringify({
+            type: 'GET_MESSAGES',
+            payload: messages,
+          }));
+          break;
+        case 'SET_MESSAGE':
+          const message = JSON.parse(JSON.stringify(payload)) as MessageFields;
+
+          const user = await User.findById(message.user);
+
+          if (!user) break;
+
+          const datetime = new Date().toISOString();
+
+          const newMessage = await setMessage(message, datetime);
+
+          Object.keys(activeConnections).forEach(connId => {
+            const conn = activeConnections[connId];
+            conn.send(JSON.stringify({
+              type: 'NEW_MESSAGE',
+              payload: [{
+                _id: newMessage._id,
+                user: {
+                  _id: user._id,
+                  username: user.username,
+                  displayName: user.displayName,
+                  avatar: user.avatar,
+                },
+                text: newMessage.text,
+                datetime,
+              }],
+            }));
+          });
+
+          break;
         default:
-          console.log('Unknown message type', decodedMessage.type);
+          ws.send(JSON.stringify({
+            type: 'ERROR',
+            payload: 'This type is not exist',
+          }));
       }
     } catch (e) {
-      console.log(e);
+      if (e) {
+        ws.send(JSON.stringify({
+          type: 'ERROR',
+          payload: JSON.parse(JSON.stringify(e.toString())),
+        }));
+      }
     }
   });
 });
+
+async function setMessage(message: MessageFields, datetime: string) {
+  const result = new Message({
+    user: message.user,
+    text: message.text,
+    datetime,
+  }) ;
+
+  await result.save();
+  return result;
+}
 
 export default messagesRouter;
