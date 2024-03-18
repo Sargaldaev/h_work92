@@ -1,23 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { PersistGate } from 'redux-persist/integration/react';
+import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
+import { persistor, store } from './app/store.ts';
+import { addInterceptors } from './axiosApi.ts';
 import App from './App.tsx';
-import {PersistGate} from 'redux-persist/integration/react';
-import {persister, store} from './app/store.ts';
-import {Provider} from 'react-redux';
-import {addInterceptor} from './axiosApi.ts';
-import {BrowserRouter} from 'react-router-dom';
+import './index.css';
 
-addInterceptor(store);
+addInterceptors(store);
 
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+root.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <PersistGate persistor={persister}>
+    <PersistGate persistor={persistor}>
+      <Provider store={store}>
         <BrowserRouter>
           <App/>
         </BrowserRouter>
-      </PersistGate>
-    </Provider>
+      </Provider>
+    </PersistGate>
   </React.StrictMode>,
 );

@@ -10,7 +10,7 @@ export interface IncomingMessage {
   payload: string;
 }
 
-export interface UserFields {
+export interface User {
   username: string;
   password: string;
   token: string;
@@ -19,10 +19,9 @@ export interface UserFields {
   avatar?: string | null;
 }
 
-export type UserSecure = Omit<UserFields, 'password' | 'token'>;
+export type UserSecure = Omit<User, 'password' | 'token'>;
 
 export interface Message {
-  _id?:string;
   user: Types.ObjectId;
   text: string;
   datetime: Date,

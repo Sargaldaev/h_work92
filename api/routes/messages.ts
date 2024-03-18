@@ -1,10 +1,10 @@
 import express from 'express';
 import expressWs from 'express-ws';
-import {ActiveConnections, IncomingMessage, Message as MessageFields, UserFields} from '../types';
-import User from '../models/User';
-import {HydratedDocument} from 'mongoose';
 import Message from '../models/Message';
-
+import authWs from '../middleware/auth.ws';
+import { ActiveConnections, Message as message, IncomingMessage, User as user } from '../types';
+import User from '../models/User';
+import { HydratedDocument } from 'mongoose';
 
 const app = express();
 const messagesRouter = express.Router();
@@ -26,8 +26,16 @@ messagesRouter.ws('/:id', (ws, req) => {
 
     try {
       switch (type) {
+        case 'LOGIN':
+          void await authWs(payload);
+
+          ws.send(JSON.stringify({
+            type: 'LOGIN',
+            payload: 'OK',
+          }));
+          break;
         case 'GET_USERS':
-          const onlineUsers: HydratedDocument<UserFields>[] = [];
+          const onlineUsers: HydratedDocument<user>[] = [];
 
           const promises = Object.keys(activeConnections).map(async (userId) => {
             const user = await User.findById(userId);
@@ -61,7 +69,7 @@ messagesRouter.ws('/:id', (ws, req) => {
           }));
           break;
         case 'SET_MESSAGE':
-          const message = JSON.parse(JSON.stringify(payload)) as MessageFields;
+          const message = JSON.parse(JSON.stringify(payload)) as message;
 
           const user = await User.findById(message.user);
 
@@ -107,12 +115,12 @@ messagesRouter.ws('/:id', (ws, req) => {
   });
 });
 
-async function setMessage(message: MessageFields, datetime: string) {
+async function setMessage(message: message, datetime: string) {
   const result = new Message({
     user: message.user,
     text: message.text,
     datetime,
-  }) ;
+  });
 
   await result.save();
   return result;

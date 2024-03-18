@@ -1,75 +1,71 @@
-import {HydratedDocument, Model, model, Schema} from 'mongoose';
+import { HydratedDocument, Model, model, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
-import {randomUUID} from 'crypto';
-import {UserFields} from '../types';
+import { User } from '../types';
+import { randomUUID } from 'crypto';
 
-const SALT_WORK_FACTOR = 10;
+const SALT_WORK_FACTORS = 10;
 
-
-export interface UserMethods extends UserFields {
+export interface UserMethods extends User {
   generateToken(): void;
-
-  checkPassword(password: string): Promise<boolean>;
 }
 
-type UserModel = Model<UserFields, {}, UserMethods>;
+type UserModel = Model<User, {}, UserMethods>;
 
-const UserSchema = new Schema<UserFields, UserModel, UserMethods>({
+const UserSchema = new Schema<User, UserModel, UserMethods>({
   username: {
     type: String,
     required: true,
     unique: true,
     validate: {
       validator: async function (
-        this: HydratedDocument<UserFields>,
+        this: HydratedDocument<User>,
         username: string,
       ): Promise<boolean> {
         if (!this.isModified('username')) return true;
-        const user: HydratedDocument<UserFields> | null = await User.findOne({username});
-        return !Boolean(user);
+        const user: HydratedDocument<User> | null = await User.findOne({ username });
+        return !Boolean(user!);
       },
       message: 'This user is already registered',
     },
   },
   password: {
     type: String,
-    required: true
-  },
-  displayName: {
-    type: String,
-    required: true
+    required: true,
   },
   token: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
+  role: {
+    type: String,
+    required: true,
+    default: 'user',
+    enum: ['user', 'admin'],
+  },
+  displayName: String,
+  avatar: String,
 });
 
 UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
-    return next();
-  }
+  if (!this.isModified('password')) return next();
 
-  const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
+  const salt = await bcrypt.genSalt(SALT_WORK_FACTORS);
   this.password = await bcrypt.hash(this.password, salt);
-
   next();
 });
 
 UserSchema.set('toJSON', {
-  transform: (doc, ret) => {
+  transform: (doc, ret, options) => {
     delete ret.password;
-    return ret;
-  }
-});
 
-UserSchema.methods.checkPassword = function (password) {
-  return bcrypt.compare(password, this.password);
-};
+    return ret;
+  },
+});
 
 UserSchema.methods.generateToken = function () {
   this.token = randomUUID();
 };
 
 const User = model('User', UserSchema);
+
 export default User;

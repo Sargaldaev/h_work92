@@ -1,27 +1,28 @@
 import express from 'express';
-import mongoose from 'mongoose';
-import expressWs from 'express-ws';
 import cors from 'cors';
+import mongoose from 'mongoose';
 import config from './config';
-import usersRouter from './routers/users';
-import messagesRouter from './routers/messages';
+import usersRouter from './routes/users';
+import expressWs from 'express-ws';
+import messagesRouter from './routes/messages';
 
-const port = 8000;
 const app = express();
+const port = 8000;
 
 expressWs(app);
+
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public'));
 app.use('/users', usersRouter);
 app.use('/chat', messagesRouter);
 
-
-const run = async () => {
+(async () => {
   await mongoose.connect(config.db);
-  app.listen(port, () => console.log(`server started on ${port} port`));
+
+  app.listen(port, () => console.log(`Server running at ${port} port...`));
+
   process.on('exit', () => {
     mongoose.disconnect();
   });
-};
-
-void run().catch(e => console.log(e));
+})().catch((e) => console.error(e));

@@ -1,53 +1,54 @@
 export interface User {
   _id: string;
   username: string;
-  displayName: string;
   password: string;
+  role: string;
   token: string;
+  displayName?: string;
+  avatar?: File | null;
 }
 
-export type UserWithoutPasswordAndToken = Omit<User, 'password' | 'token'>;
-
-
-export interface Register {
-  username: string;
-  password: string;
-  displayName: string;
+export interface UserForUsing extends Omit<User, 'password' | 'token'> {
+  avatar: string | null;
 }
 
-export interface Login {
-  username: string;
-  password: string;
-}
-export interface ChatMessage {
-  _id: string
-  author: UserWithoutPasswordAndToken,
-  message: string
-}
+export type UserRegister = Omit<User, '_id' | 'token' | 'role'>;
 
-export interface MessageSend {
-  author: string;
+export interface RegisterResponse {
+  user: UserForUsing;
   message: string;
 }
-
-export interface IncomingMessage {
-  type: string,
-  payload: ChatMessage
-}
-
 
 export interface ValidationError {
   errors: {
     [key: string]: {
-      name: string,
-      message: string,
-    }
-  },
+      name: string;
+      message: string;
+    };
+  };
+  error: string;
   message: string;
   name: string;
   _message: string;
 }
 
-export interface GlobalError {
-  error: string;
+export interface Message {
+  _id: string;
+  user: UserForUsing;
+  text: string;
+  datetime: Date;
+}
+
+export interface MessageForm {
+  text: string;
+}
+
+export interface MessageRequest {
+  user: string;
+  text: string;
+}
+
+export interface IncomingMessage {
+  type: string;
+  payload: [];
 }

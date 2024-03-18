@@ -1,31 +1,28 @@
-import { ChatMessage, UserWithoutPasswordAndToken } from '../../types';
-import { createSlice } from '@reduxjs/toolkit';
+import {Message, UserForUsing} from '../../types';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 interface State {
-  messages: ChatMessage[];
-  users: UserWithoutPasswordAndToken[];
+  messages: Message[];
+  onlineUsers: UserForUsing[];
 }
 
 const initialState: State = {
   messages: [],
-  users: [],
+  onlineUsers: [],
 };
 
 const chatSlice = createSlice({
   name: 'chat',
   initialState,
   reducers: {
-    addMessages: (state: State, action) => {
-      state.messages.push(...action.payload);
+    setMessages: (state, {payload}: PayloadAction<Message[]>) => {
+      state.messages.push(...payload);
     },
-    addMessage: (state: State, action) => {
-      state.messages.push(action.payload);
+    setUsers: (state, {payload}: PayloadAction<UserForUsing[]>) => {
+      state.onlineUsers.push(...payload);
     },
-    addUsers: (state: State, action) => {
-      state.users.push(...action.payload);
-    }
   },
 });
 
 export const chatReducer = chatSlice.reducer;
-export const { addMessages, addMessage, addUsers } = chatSlice.actions;
+export const {setMessages, setUsers} = chatSlice.actions;
