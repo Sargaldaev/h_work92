@@ -9,7 +9,7 @@ interface Props {
   onLogout: React.MouseEventHandler;
 }
 
-const ToolbarMenu: React.FC<Props> = ({ user, onLogout }) => {
+const ToolbarMenu: React.FC<Props> = ({user, onLogout}) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const open = Boolean(anchorEl);
@@ -22,26 +22,29 @@ const ToolbarMenu: React.FC<Props> = ({ user, onLogout }) => {
     setAnchorEl(null);
   };
 
-  let avatar = "";
+  let avatar = '';
+
   if (user.avatar) {
-    avatar = user.avatar.includes("http")
+    avatar = user.avatar.includes('images')
       ? user.avatar.toString()
       : apiUrl + user.avatar;
   }
 
+  console.log(avatar);
+
   return (
     <>
-      <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
+      <Box sx={{display: 'flex', alignItems: 'center', textAlign: 'center'}}>
         <Tooltip title="Account settings">
           <IconButton
             onClick={handleClick}
             size="small"
-            sx={{ ml: 2 }}
-            aria-controls={open ? "account-menu" : undefined}
+            sx={{ml: 2}}
+            aria-controls={open ? 'account-menu' : undefined}
             aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
+            aria-expanded={open ? 'true' : undefined}
           >
-            <Avatar src={avatar} sx={{ width: 32, height: 32 }}>
+            <Avatar src={avatar} sx={{width: 32, height: 32}}>
               {user.username[0].toUpperCase()}
             </Avatar>
           </IconButton>
@@ -56,47 +59,47 @@ const ToolbarMenu: React.FC<Props> = ({ user, onLogout }) => {
         PaperProps={{
           elevation: 0,
           sx: {
-            overflow: "visible",
-            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+            overflow: 'visible',
+            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
             mt: 1.5,
-            color: "#fff",
-            bgcolor: "#222",
-            "& .MuiMenuItem-root": {
-              ":hover": {
-                bgcolor: "rgba(227,227,227,.08)",
-                transition: "all .1s linear",
+            color: '#fff',
+            bgcolor: '#222',
+            '& .MuiMenuItem-root': {
+              ':hover': {
+                bgcolor: 'rgba(227,227,227,.08)',
+                transition: 'all .1s linear',
               },
             },
-            "& .MuiAvatar-root": {
+            '& .MuiAvatar-root': {
               width: 32,
               height: 32,
               ml: -0.5,
               mr: 1,
             },
-            "&:before": {
+            '&:before': {
               content: '""',
-              display: "block",
-              position: "absolute",
+              display: 'block',
+              position: 'absolute',
               top: 0,
               right: 14,
               width: 10,
               height: 10,
-              bgcolor: "#222",
-              transform: "translateY(-50%) rotate(45deg)",
+              bgcolor: '#222',
+              transform: 'translateY(-50%) rotate(45deg)',
               zIndex: 0,
             },
           },
         }}
-        transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+        transformOrigin={{horizontal: 'right', vertical: 'top'}}
+        anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
       >
-        <MenuItem onClick={handleClose} sx={{ width: 200 }}>
-          <Avatar src={avatar} /> {user.displayName || user.username}
+        <MenuItem onClick={handleClose} sx={{width: 200}}>
+          <Avatar src={avatar}/> {user.displayName || user.username}
         </MenuItem>
-        <Divider color="#ccc" />
+        <Divider color="#ccc"/>
         <MenuItem onClick={onLogout}>
           <ListItemIcon>
-            <Logout fontSize="small" sx={{ color: "#fff", marginLeft: 0.5 }} />
+            <Logout fontSize="small" sx={{color: '#fff', marginLeft: 0.5}}/>
           </ListItemIcon>
           Logout
         </MenuItem>
