@@ -20,7 +20,7 @@ app.use('/chat', messagesRouter);
 (async () => {
   await mongoose.connect(config.db);
 
-  app.listen(port, () => console.log(`Server running at ${port} port...`));
+  app.listen(port, () => console.log(`Server running at ${port} port`));
 
   process.on('exit', () => {
     mongoose.disconnect();

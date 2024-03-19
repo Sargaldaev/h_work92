@@ -7,10 +7,11 @@ import { MessageForm } from '../../../types';
 
 interface Props {
   sendMessage: (message: MessageForm) => void;
+  deleteMessage: (_id: string) => void;
 }
 
-const ChatMessages: React.FC<Props> = ({ sendMessage }) => {
-  const { messages } = useAppSelector(state => state.chat);
+const ChatMessages: React.FC<Props> = ({sendMessage, deleteMessage}) => {
+  const {messages} = useAppSelector(state => state.chat);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -35,11 +36,11 @@ const ChatMessages: React.FC<Props> = ({ sendMessage }) => {
       justifyContent="space-between"
     >
       <Box
-        sx={{ height: 500, overflowY: 'auto', paddingBottom: 2 }}
+        sx={{height: 500, overflowY: 'auto', paddingBottom: 2}}
         paddingRight={1}
         ref={containerRef}
       >
-        {messages.map(message => <ChatMessage message={message} key={message._id}/>)}
+        {messages.map(message => <ChatMessage deleteMessage={deleteMessage} message={message} key={message._id}/>)}
       </Box>
 
       <ChatMessagesForm onSubmit={sendMessage}/>

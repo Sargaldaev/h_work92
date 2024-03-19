@@ -1,18 +1,23 @@
 import React from 'react';
-import { Avatar, Box, Card, Divider, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Button, Card, Divider, Stack, Typography } from '@mui/material';
 import { Message } from '../../../types';
 import { apiUrl } from '../../../constants.ts';
 import dayjs from 'dayjs';
+import { useAppDispatch } from '../../../app/hook.ts';
+import { removeMessage } from '../../../store/chat/chatSlice.ts';
 
 interface Props {
   message: Message;
+  deleteMessage: (_id: string) => void;
 }
 
 const colors = ['#FF0000', '#0000FF', '#00FF00', '#FFFF00', '#FFC0CB', '#800080', '#FFA500'];
 
-const ChatMessage: React.FC<Props> = ({ message }) => {
+const ChatMessage: React.FC<Props> = ({message, deleteMessage}) => {
   const date = dayjs(message.datetime).format('DD/MM/YYYY HH:mm:ss');
   const timeDifference = -dayjs(message.datetime).diff();
+
+
 
   const daysPassed: number = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
   const hoursPassed: number = Math.floor(timeDifference / (1000 * 60 * 60));
@@ -31,8 +36,8 @@ const ChatMessage: React.FC<Props> = ({ message }) => {
   };
 
   return (
-    <Card sx={{ mt: 2 }}>
-      <Box sx={{ px: 2, py: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
+    <Card sx={{mt: 2}}>
+      <Box sx={{px: 2, py: 1, display: 'flex', alignItems: 'center', gap: 2}}>
         {
           message.user.avatar ?
             <Avatar src={apiUrl + message.user.avatar}/>
@@ -40,21 +45,22 @@ const ChatMessage: React.FC<Props> = ({ message }) => {
         }
         <Stack>
           <Typography
-            sx={{ color: randomColor(colors) }}
+            sx={{color: randomColor(colors)}}
             fontSize={22}
             fontWeight={700}
           >
             {message.user.displayName}
           </Typography>
           <Typography variant="body2">
-            { timeResult }
+            {timeResult}
           </Typography>
         </Stack>
       </Box>
-      <Divider />
-      <Typography sx={{ m: 2 }}>
+      <Divider/>
+      <Typography sx={{m: 2}}>
         {message.text}
       </Typography>
+      <Button onClick={() => deleteMessage(message._id)}>Delete</Button>
     </Card>
   );
 };

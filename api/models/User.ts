@@ -40,7 +40,7 @@ const UserSchema = new Schema<User, UserModel, UserMethods>({
     type: String,
     required: true,
     default: 'user',
-    enum: ['user', 'admin'],
+    enum: ['user', 'moderator'],
   },
   displayName: String,
   avatar: String,

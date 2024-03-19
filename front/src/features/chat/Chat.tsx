@@ -1,16 +1,17 @@
-import {Box} from '@mui/material';
+import { Box } from '@mui/material';
 import ChatUsers from './components/ChatUsers';
 import ChatMessages from './components/ChatMessages';
-import {useEffect, useRef} from 'react';
-import {IncomingMessage, MessageForm, MessageRequest} from '../../types';
-import {setMessages, setUsers} from '../../store/chat/chatSlice.ts';
-import {useAppDispatch, useAppSelector} from '../../app/hook.ts';
-import {connect} from 'react-redux';
+import { useEffect, useRef } from 'react';
+import { DeleteById, IncomingMessage, MessageForm, MessageRequest } from '../../types';
+import { addMessages, removeMessage, setMessages, setUsers } from '../../store/chat/chatSlice.ts';
+import { useAppDispatch, useAppSelector } from '../../app/hook.ts';
+import { connect } from 'react-redux';
 
 const Chat = () => {
   const dispatch = useAppDispatch();
   const {messages, onlineUsers} = useAppSelector(state => state.chat);
   const {user} = useAppSelector(state => state.users);
+
 
   const ws = useRef<WebSocket | null>(null);
 
@@ -29,12 +30,14 @@ const Chat = () => {
     };
 
     ws.current.onopen = () => {
-      if (ws.current && ws.current.readyState === WebSocket.OPEN && !messages.length) {
+
+      if ((ws.current && ws.current.readyState === WebSocket.OPEN) && !messages.length) {
         ws.current.send(JSON.stringify({
           type: 'GET_MESSAGES',
           payload: '',
         }));
       }
+
       if (ws.current && ws.current.readyState === WebSocket.OPEN && !onlineUsers.length) {
         ws.current.send(JSON.stringify({
           type: 'GET_USERS',
@@ -46,10 +49,14 @@ const Chat = () => {
     ws.current.onmessage = (event) => {
       const {type, payload} = JSON.parse(event.data) as IncomingMessage;
 
-      if (type === 'GET_MESSAGES' || type === 'NEW_MESSAGE') {
+      if (type === 'GET_MESSAGES') {
         dispatch(setMessages(payload));
+      } else if (type === 'NEW_MESSAGE') {
+        dispatch(addMessages(payload));
       } else if (type === 'GET_USERS') {
         dispatch(setUsers(payload));
+      } else if (type === 'DELETE_MESSAGE') {
+        dispatch(setMessages(payload));
       }
     };
 
@@ -58,7 +65,7 @@ const Chat = () => {
         ws.current.close();
       }
     };
-  }, [ws.current]);
+  }, [dispatch, messages.length, onlineUsers.length, user]);
 
   const sendMessage = (message: MessageForm) => {
     if (!ws.current || !user) return;
@@ -74,6 +81,20 @@ const Chat = () => {
     }));
   };
 
+  const deleteMessage = (_id: string) => {
+    if (!ws.current || !user) return;
+
+    const payload = {
+      messageId: _id,
+      userId:user._id
+    };
+
+    ws.current.send(JSON.stringify({
+      type: 'DELETE_MESSAGE',
+      payload,
+    }));
+  };
+
   return (
     <Box
       display="flex"
@@ -83,7 +104,7 @@ const Chat = () => {
       paddingY={5}
     >
       <ChatUsers/>
-      <ChatMessages sendMessage={sendMessage}/>
+      <ChatMessages deleteMessage={deleteMessage} sendMessage={sendMessage}/>
     </Box>
   );
 };

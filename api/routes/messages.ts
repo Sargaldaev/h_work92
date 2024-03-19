@@ -2,9 +2,9 @@ import express from 'express';
 import expressWs from 'express-ws';
 import Message from '../models/Message';
 import authWs from '../middleware/auth.ws';
-import { ActiveConnections, Message as message, IncomingMessage, User as user } from '../types';
+import {ActiveConnections, Message as message, IncomingMessage, User as user} from '../types';
 import User from '../models/User';
-import { HydratedDocument } from 'mongoose';
+import {HydratedDocument} from 'mongoose';
 
 const app = express();
 const messagesRouter = express.Router();
@@ -22,7 +22,7 @@ messagesRouter.ws('/:id', (ws, req) => {
   });
 
   ws.on('message', async (msg) => {
-    const { type, payload } = JSON.parse(msg.toString()) as IncomingMessage;
+    const {type, payload} = JSON.parse(msg.toString()) as IncomingMessage;
 
     try {
       switch (type) {
@@ -33,6 +33,54 @@ messagesRouter.ws('/:id', (ws, req) => {
             type: 'LOGIN',
             payload: 'OK',
           }));
+          break;
+
+        case 'DELETE_MESSAGE':
+          const {messageId,userId} = JSON.parse(JSON.stringify(payload)) as { messageId: string ,userId:string};
+
+          if (!messageId) {
+            ws.send(JSON.stringify({
+              type: 'ERROR',
+              payload: 'User not found',
+            }));
+            break;
+          }
+          const messageToDelete = await Message.findById(messageId);
+
+          if (!messageToDelete) {
+            ws.send(JSON.stringify({
+              type: 'ERROR',
+              payload: 'Message not found',
+            }));
+            break;
+          }
+
+
+          const executor = await User.findById(userId)
+
+          if (executor?.role !== 'moderator') {
+            ws.send(JSON.stringify({
+              type: 'ERROR',
+              payload: 'You do not have permission to delete messages',
+            }));
+            break;
+          }
+
+          await messageToDelete.deleteOne();
+
+          const updatedMessages = await Message.find()
+            .sort({datetime: 1})
+            .populate('user', 'username role displayName avatar')
+            .limit(30);
+
+          Object.keys(activeConnections).forEach(connId => {
+            const conn = activeConnections[connId];
+            conn.send(JSON.stringify({
+              type: 'GET_MESSAGES',
+              payload: updatedMessages,
+            }));
+          });
+
           break;
         case 'GET_USERS':
           const onlineUsers: HydratedDocument<user>[] = [];
@@ -59,7 +107,7 @@ messagesRouter.ws('/:id', (ws, req) => {
           break;
         case 'GET_MESSAGES':
           const messages = await Message.find()
-            .sort({ datetime: 1 })
+            .sort({datetime: 1})
             .populate('user', 'username role displayName avatar')
             .limit(30);
 
