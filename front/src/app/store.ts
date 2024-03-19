@@ -1,13 +1,22 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
-import { usersReducer } from '../store/user/usersSlice.ts';
-import { chatReducer } from '../store/chat/chatSlice.ts';
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import {
+  FLUSH,
+  PAUSE,
+  PERSIST,
+  persistReducer,
+  persistStore,
+  PURGE,
+  REGISTER,
+  REHYDRATE,
+} from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import { usersReducer } from "../store/user/usersSlice.ts";
+import { chatReducer } from "../store/chat/chatSlice.ts";
 
 const usersPersistConfig = {
-  key: 'chat:users',
+  key: "chat:users",
   storage,
-  whitelist: ['user'],
+  whitelist: ["user"],
 };
 
 const rootReducer = combineReducers({

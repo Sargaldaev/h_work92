@@ -11,11 +11,17 @@ const MessageSchema = new Schema({
       message: 'User does not exist!',
     },
   },
+  forUser: {
+    type: Types.ObjectId,
+    ref: 'User',
+    default: null,
+  },
   text: {
     type: String,
     required: true,
   },
   datetime: Date,
+
 });
 
 const Message = model('Message', MessageSchema);

@@ -1,6 +1,6 @@
-import { User, ValidationError } from '../../types';
-import { createSlice } from '@reduxjs/toolkit';
-import { login, register } from './usersThunk.ts';
+import { User, ValidationError } from "../../types";
+import { createSlice } from "@reduxjs/toolkit";
+import { login, register } from "./usersThunk.ts";
 
 interface State {
   user: User | null;
@@ -15,7 +15,7 @@ const initialState: State = {
 };
 
 export const usersSlice = createSlice({
-  name: 'users',
+  name: "users",
   initialState,
   reducers: {
     clearUser: (state: State) => {

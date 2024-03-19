@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import {
   Avatar,
   Box,
@@ -11,28 +11,30 @@ import {
   styled,
   TextField,
   Typography,
-} from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { UserRegister } from '../../types';
-import { useAppDispatch, useAppSelector } from '../../app/hook';
-import { register } from '../../store/user/usersThunk.ts';
-import FileInput from '../../components/UI/FileInput';
+} from "@mui/material";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { UserRegister } from "../../types";
+import { useAppDispatch, useAppSelector } from "../../app/hook";
+import { register } from "../../store/user/usersThunk.ts";
+import FileInput from "../../components/UI/FileInput";
 
 const CssContainer = styled(Container)({
-  margin: '150px auto',
-  padding: '10px',
+  margin: "150px auto",
+  padding: "10px",
 });
 
 const initialState: UserRegister = {
-  username: '',
-  displayName: '',
+  username: "",
+  displayName: "",
   avatar: null,
-  password: '',
+  password: "",
 };
 
 const SignUp = () => {
   const dispatch = useAppDispatch();
-  const { registerLoading, registerError } = useAppSelector((state) => state.users);
+  const { registerLoading, registerError } = useAppSelector(
+    (state) => state.users,
+  );
 
   const navigate = useNavigate();
 
@@ -60,7 +62,7 @@ const SignUp = () => {
 
     try {
       await dispatch(register(state)).unwrap();
-      navigate('/');
+      navigate("/");
     } catch {
       // nothing
     }
@@ -78,12 +80,12 @@ const SignUp = () => {
     <CssContainer maxWidth="xs">
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
           <LockOutlinedIcon />
         </Avatar>
 
@@ -95,21 +97,21 @@ const SignUp = () => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
-                sx={{ width: '100%' }}
+                sx={{ width: "100%" }}
                 required
                 label="Username"
                 name="username"
                 value={state.username}
                 onChange={changeValue}
                 autoComplete="new-username"
-                error={Boolean(getFieldError('username'))}
-                helperText={getFieldError('username')}
+                error={Boolean(getFieldError("username"))}
+                helperText={getFieldError("username")}
               />
             </Grid>
 
             <Grid item xs={12}>
               <TextField
-                sx={{ width: '100%' }}
+                sx={{ width: "100%" }}
                 label="Display name"
                 name="displayName"
                 value={state.displayName}
@@ -120,7 +122,7 @@ const SignUp = () => {
 
             <Grid item xs={12}>
               <TextField
-                sx={{ width: '100%' }}
+                sx={{ width: "100%" }}
                 required
                 name="password"
                 label="Password"
@@ -128,14 +130,18 @@ const SignUp = () => {
                 value={state.password}
                 onChange={changeValue}
                 autoComplete="new-password"
-                error={Boolean(getFieldError('password'))}
-                helperText={getFieldError('password')}
+                error={Boolean(getFieldError("password"))}
+                helperText={getFieldError("password")}
               />
             </Grid>
           </Grid>
 
           <Grid item xs={12} display="flex" alignItems="center" gap={3}>
-            <FileInput name="image" onChange={changeFileValue} image={state.avatar} />
+            <FileInput
+              name="image"
+              onChange={changeFileValue}
+              image={state.avatar}
+            />
 
             <Button
               type="submit"
@@ -144,20 +150,25 @@ const SignUp = () => {
               sx={{
                 mt: 3,
                 mb: 2,
-                ':disabled': {
-                  pointerEvents: 'auto',
-                  cursor: 'not-allowed',
+                ":disabled": {
+                  pointerEvents: "auto",
+                  cursor: "not-allowed",
                 },
               }}
               disabled={registerLoading}
             >
-              {registerLoading ? <CircularProgress size={25} /> : 'Sign Up'}
+              {registerLoading ? <CircularProgress size={25} /> : "Sign Up"}
             </Button>
           </Grid>
 
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Link component={RouterLink} fontSize="JetBrains Mono" to="/login" variant="body2">
+              <Link
+                component={RouterLink}
+                fontSize="JetBrains Mono"
+                to="/login"
+                variant="body2"
+              >
                 Already have an account? Sign In
               </Link>
             </Grid>

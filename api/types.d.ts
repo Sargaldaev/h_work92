@@ -23,6 +23,7 @@ export type UserSecure = Omit<User, 'password' | 'token'>;
 
 export interface Message {
   user: Types.ObjectId;
+  forUser?:Types.ObjectId;
   text: string;
   datetime: Date,
 }

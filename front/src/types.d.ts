@@ -8,11 +8,11 @@ export interface User {
   avatar?: File | null;
 }
 
-export interface UserForUsing extends Omit<User, 'password' | 'token'> {
+export interface UserForUsing extends Omit<User, "password" | "token"> {
   avatar: string | null;
 }
 
-export type UserRegister = Omit<User, '_id' | 'token' | 'role'>;
+export type UserRegister = Omit<User, "_id" | "token" | "role">;
 
 export interface RegisterResponse {
   user: UserForUsing;
@@ -35,6 +35,7 @@ export interface ValidationError {
 export interface Message {
   _id: string;
   user: UserForUsing;
+  forUser?: string;
   text: string;
   datetime: Date;
 }
@@ -46,6 +47,7 @@ export interface MessageForm {
 export interface MessageRequest {
   user: string;
   text: string;
+  forUser?: string;
 }
 
 export interface IncomingMessage {

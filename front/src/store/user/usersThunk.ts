@@ -1,13 +1,18 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import axiosApi from '../../axiosApi.ts';
-import { RegisterResponse, UserForUsing, UserRegister, ValidationError } from '../../types';
-import { isAxiosError } from 'axios';
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import axiosApi from "../../axiosApi.ts";
+import {
+  RegisterResponse,
+  UserForUsing,
+  UserRegister,
+  ValidationError,
+} from "../../types";
+import { isAxiosError } from "axios";
 
 export const register = createAsyncThunk<
   UserForUsing,
   UserRegister,
   { rejectValue: ValidationError }
->('users/register', async (userRegister, {rejectWithValue}) => {
+>("users/register", async (userRegister, { rejectWithValue }) => {
   try {
     const formData = new FormData();
     const keys = Object.keys(userRegister) as (keyof UserRegister)[];
@@ -20,7 +25,7 @@ export const register = createAsyncThunk<
       }
     });
 
-    const {data} = await axiosApi.post<UserForUsing>('/users', formData);
+    const { data } = await axiosApi.post<UserForUsing>("/users", formData);
 
     return data;
   } catch (e) {
@@ -36,9 +41,12 @@ export const login = createAsyncThunk<
   UserForUsing,
   UserRegister,
   { rejectValue: ValidationError }
->('users/login', async (user, {rejectWithValue}) => {
+>("users/login", async (user, { rejectWithValue }) => {
   try {
-    const {data} = await axiosApi.post<RegisterResponse>('/users/sessions', user);
+    const { data } = await axiosApi.post<RegisterResponse>(
+      "/users/sessions",
+      user,
+    );
     return data.user;
   } catch (e) {
     if (isAxiosError(e) && e.response && e.response.status === 400) {
@@ -49,6 +57,6 @@ export const login = createAsyncThunk<
   }
 });
 
-export const logout = createAsyncThunk('users/logout', async () => {
-  await axiosApi.delete('/users/sessions');
+export const logout = createAsyncThunk("users/logout", async () => {
+  await axiosApi.delete("/users/sessions");
 });

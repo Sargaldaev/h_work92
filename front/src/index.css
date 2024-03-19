@@ -1,9 +1,7 @@
-
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -22,7 +20,7 @@ a {
 }
 
 html {
-  background: #242424!important
+  background: #242424 !important;
 }
 
 a:hover {
@@ -73,7 +71,7 @@ button:focus-visible {
 }
 
 #chat-body ::-webkit-scrollbar {
-  width: .5rem;
+  width: 0.5rem;
 }
 
 #chat-body ::-webkit-scrollbar-thumb {

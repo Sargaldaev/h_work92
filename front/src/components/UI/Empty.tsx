@@ -1,5 +1,5 @@
-import React, { PropsWithChildren } from 'react';
-import { Typography } from '@mui/material';
+import React, { PropsWithChildren } from "react";
+import { Typography } from "@mui/material";
 
 const Empty: React.FC<PropsWithChildren> = ({ children }) => {
   return (
@@ -8,7 +8,7 @@ const Empty: React.FC<PropsWithChildren> = ({ children }) => {
       position="absolute"
       top="50%"
       left="50%"
-      sx={{ transform: 'translate(-50%)' }}
+      sx={{ transform: "translate(-50%)" }}
     >
       {children}
     </Typography>

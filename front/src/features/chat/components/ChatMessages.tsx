@@ -1,17 +1,17 @@
-import { Box } from '@mui/material';
-import React, { useEffect, useRef } from 'react';
-import { useAppSelector } from '../../../app/hook.ts';
-import ChatMessage from './ChatMessage.tsx';
-import ChatMessagesForm from './ChatMessagesForm.tsx';
-import { MessageForm } from '../../../types';
+import { Box } from "@mui/material";
+import React, { useEffect, useRef } from "react";
+import { useAppSelector } from "../../../app/hook.ts";
+import ChatMessage from "./ChatMessage.tsx";
+import ChatMessagesForm from "./ChatMessagesForm.tsx";
+import { MessageForm } from "../../../types";
 
 interface Props {
   sendMessage: (message: MessageForm) => void;
   deleteMessage: (_id: string) => void;
 }
 
-const ChatMessages: React.FC<Props> = ({sendMessage, deleteMessage}) => {
-  const {messages} = useAppSelector(state => state.chat);
+const ChatMessages: React.FC<Props> = ({ sendMessage, deleteMessage }) => {
+  const { messages } = useAppSelector((state) => state.chat);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -21,6 +21,7 @@ const ChatMessages: React.FC<Props> = ({sendMessage, deleteMessage}) => {
       containerElement.scrollTop = containerElement.scrollHeight;
     }
   }, [messages]);
+
 
   return (
     <Box
@@ -36,14 +37,20 @@ const ChatMessages: React.FC<Props> = ({sendMessage, deleteMessage}) => {
       justifyContent="space-between"
     >
       <Box
-        sx={{height: 500, overflowY: 'auto', paddingBottom: 2}}
+        sx={{ height: 500, overflowY: "auto", paddingBottom: 2 }}
         paddingRight={1}
         ref={containerRef}
       >
-        {messages.map(message => <ChatMessage deleteMessage={deleteMessage} message={message} key={message._id}/>)}
+        {messages.map((message) => (
+          <ChatMessage
+            deleteMessage={deleteMessage}
+            message={message}
+            key={message._id}
+          />
+        ))}
       </Box>
 
-      <ChatMessagesForm onSubmit={sendMessage}/>
+      <ChatMessagesForm onSubmit={sendMessage} />
     </Box>
   );
 };

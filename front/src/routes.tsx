@@ -1,7 +1,7 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
-import Signup from './features/users/Signup';
-import Login from './features/users/Login';
-import Chat from './features/chat/Chat.tsx';
+import { Navigate, Route, Routes } from "react-router-dom";
+import Signup from "./features/users/Signup";
+import Login from "./features/users/Login";
+import Chat from "./features/chat/Chat.tsx";
 
 const useRoutes = (isAuthenticated: boolean) => (
   <Routes>

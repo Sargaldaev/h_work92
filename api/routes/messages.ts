@@ -36,7 +36,7 @@ messagesRouter.ws('/:id', (ws, req) => {
           break;
 
         case 'DELETE_MESSAGE':
-          const {messageId,userId} = JSON.parse(JSON.stringify(payload)) as { messageId: string ,userId:string};
+          const {messageId, userId} = JSON.parse(JSON.stringify(payload)) as { messageId: string, userId: string };
 
           if (!messageId) {
             ws.send(JSON.stringify({
@@ -56,7 +56,7 @@ messagesRouter.ws('/:id', (ws, req) => {
           }
 
 
-          const executor = await User.findById(userId)
+          const executor = await User.findById(userId);
 
           if (executor?.role !== 'moderator') {
             ws.send(JSON.stringify({
@@ -133,6 +133,7 @@ messagesRouter.ws('/:id', (ws, req) => {
               type: 'NEW_MESSAGE',
               payload: [{
                 _id: newMessage._id,
+                forUser:newMessage.forUser,
                 user: {
                   _id: user._id,
                   username: user.username,
@@ -164,8 +165,11 @@ messagesRouter.ws('/:id', (ws, req) => {
 });
 
 async function setMessage(message: message, datetime: string) {
+  const forUser = await User.findById(message.forUser);
+
   const result = new Message({
     user: message.user,
+    forUser: forUser?._id || null,
     text: message.text,
     datetime,
   });
